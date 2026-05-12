@@ -67,13 +67,22 @@
             box-sizing: border-box;
         }
 
-        .summary-item {
-            border-bottom: 1px dashed #ffb6c1;
-            padding: 5px 0;
+        .summary-section-title {
+            font-size: 1.1em;
+            color: #ff4d94;
+            border-bottom: 2px solid #ffb6c1;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            font-weight: 900;
         }
-        
-        .summary-item:last-child {
-            border-bottom: none;
+        .summary-section-title:first-child {
+            margin-top: 0;
+        }
+
+        .summary-item {
+            padding: 2px 0;
+            font-size: 0.95em;
         }
 
         .color-input-area {
@@ -115,7 +124,7 @@
 
 <div class="container">
     <div id="q1">
-        <img src="https://cdn-icons-png.flaticon.com/512/4565/4565133.png" alt="heart">
+        <img src="https://cdn-icons-png.flaticon.com/512/833/833472.png" alt="heart">
         <h2>How about we make some new, sweet memories this weekend?</h2>
         <button class="btn-yes" onclick="answers.goingOut = 'Yes'; nextStep(2)">I'd love to!</button>
         <button class="btn-no" id="no1" onclick="shrinkNo()">No</button>
@@ -206,7 +215,6 @@
         document.getElementById('q' + step).classList.remove('hidden');
         noClickCount = 0;
         
-        // Hide error messages when moving pages
         document.getElementById('wrong-msg').classList.add('hidden');
         document.getElementById('color-error').classList.add('hidden');
     }
@@ -224,9 +232,6 @@
             noBtn.style.position = "absolute";
             noBtn.style.top = yesBtn.offsetTop + "px";
             noBtn.style.left = yesBtn.offsetLeft + "px";
-            noBtn.innerText = "I'd love to!";
-            noBtn.classList.remove('btn-no');
-            noBtn.classList.add('btn-yes');
             noBtn.onclick = function() { 
                 answers.goingOut = "Yes";
                 nextStep(2); 
@@ -234,12 +239,11 @@
         }
     }
 
-    // Reusable function to shake text
     function triggerShake(elementId) {
         const msg = document.getElementById(elementId);
         msg.classList.remove('hidden');
         msg.style.animation = 'none';
-        msg.offsetHeight; // trigger reflow
+        msg.offsetHeight;
         msg.style.animation = null; 
     }
 
@@ -259,7 +263,6 @@
         showSummary();
     }
 
-    // The new logic for subjective color choice
     function setCustomTheme() {
         const inputElement = document.getElementById('color-input');
         const errorMsg = document.getElementById('color-error');
@@ -274,11 +277,10 @@
             return;
         }
 
-        // Check if her input contains any of the allowed colors
         const isAllowed = allowedColors.some(color => normalizedInput.includes(color));
 
         if (isAllowed) {
-            answers.theme = rawInput; // Keep her exact typing (e.g., "Dark Blue")
+            answers.theme = rawInput;
             showSummary();
         } else {
             errorMsg.innerText = "Hmm... that doesn't quite fit my wardrobe! Try another color. 😅";
@@ -291,12 +293,17 @@
         const summaryBox = document.getElementById('summary-content');
         
         summaryBox.innerHTML = `
+            <div class="summary-section-title">☀️ Saturday (Day)</div>
             <div class="summary-item"><b>Going Out:</b> ${answers.goingOut}</div>
             <div class="summary-item"><b>Day:</b> ${answers.day}</div>
-            <div class="summary-item"><b>Night Out:</b> ${answers.nightOut}</div>
+            <div class="summary-item"><b>Theme:</b> <span style="text-transform: capitalize;">${answers.theme}</span></div>
+
+            <div class="summary-section-title">🌙 Saturday (Night)</div>
+            <div class="summary-item"><b>Night Out:</b> ${answers.nightOut}, CKT and Ipoh Night life (again)</div>
+
+            <div class="summary-section-title">🍿 Sunday (Night)</div>
             <div class="summary-item"><b>Movie Time:</b> ${answers.movieTime}</div>
             <div class="summary-item"><b>Movie:</b> ${answers.movieChoice}</div>
-            <div class="summary-item"><b>Theme:</b> ${answers.theme}</div>
         `;
         
         document.getElementById('summary-page').classList.remove('hidden');
