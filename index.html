@@ -115,10 +115,19 @@
         }
     }
 
-    function finish() {
-        document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
-        document.getElementById('final').classList.remove('hidden');
-    }
+async function finish() {
+    document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById('final').classList.remove('hidden');
+
+    const response = await fetch("https://formspree.io/f/xykoobdw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            message: "She said YES to the weekend plans!",
+            timestamp: new Date().toLocaleString()
+        })
+    });
+}
 </script>
 </body>
 </html>
