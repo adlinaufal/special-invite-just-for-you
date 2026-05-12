@@ -48,6 +48,24 @@
             font-weight: bold;
             font-size: 1.2em;
             line-height: 1.8;
+            text-transform: capitalize;
+        }
+
+        .color-input-area {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            width: 80%;
+            margin-bottom: 10px;
+            text-align: center;
         }
     </style>
 </head>
@@ -83,8 +101,20 @@
 
     <div id="q5" class="hidden">
         <h2>Which one for Sunday night?</h2>
-        <button class="btn-yes" onclick="showSummary('Ghost in The Cell')">Ghost in The Cell (Indo)</button>
-        <button class="btn-yes" onclick="showSummary('Salmokji')">Salmokji (Korean)</button>
+        <button class="btn-yes" onclick="answers.movie = 'Ghost in The Cell'; nextStep(6)">Ghost in The Cell (Indo)</button>
+        <button class="btn-yes" onclick="answers.movie = 'Salmokji'; nextStep(6)">Salmokji (Korean)</button>
+    </div>
+
+    <div id="q6" class="hidden">
+        <h2>One last thing... the dress code! 🤎</h2>
+        <p>Can we match and wear <b>Brown</b> for the day?</p>
+        <button class="btn-yes" onclick="setTheme('Brown')">Yes, let's do it!</button>
+        <button class="btn-no" id="no-color-btn" onclick="showColorInput()">No, let's wear...</button>
+        
+        <div id="custom-color-div" class="hidden color-input-area">
+            <input type="text" id="color-input" placeholder="Type a color here...">
+            <button class="btn-yes" style="padding: 8px 16px; font-size: 14px;" onclick="setCustomTheme()">Set Theme</button>
+        </div>
     </div>
 
     <div id="summary-page" class="hidden">
@@ -97,7 +127,7 @@
     <div id="final" class="hidden">
         <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" alt="celebrate">
         <h2>Yay! It's a date! ❤️</h2>
-        <p>I promise the CKT will be better than the last place. Prepare for a wonderful weekend, Can't wait to see your smile!</p>
+        <p>I promise the CKT will be better than the last place. Prepare for a wonderful weekend. Can't wait to see your smile!</p>
     </div>
 </div>
 
@@ -106,7 +136,8 @@
     
     let answers = {
         day: "",
-        movie: ""
+        movie: "",
+        theme: ""
     };
 
     function nextStep(step) {
@@ -143,12 +174,31 @@
         noBtn.onclick = function() { nextStep(5); };
     }
 
-    function showSummary(movieChoice) {
-        answers.movie = movieChoice;
+    function showColorInput() {
+        document.getElementById('custom-color-div').classList.remove('hidden');
+        document.getElementById('no-color-btn').classList.add('hidden'); // Hide the 'No' button once clicked
+    }
+
+    function setTheme(color) {
+        answers.theme = color;
+        showSummary();
+    }
+
+    function setCustomTheme() {
+        const input = document.getElementById('color-input').value;
+        if(input.trim() === "") {
+            alert("Please type a color!");
+            return;
+        }
+        answers.theme = input;
+        showSummary();
+    }
+
+    function showSummary() {
         document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
         
         const summaryBox = document.getElementById('summary-content');
-        summaryBox.innerHTML = `✨ Day: ${answers.day}<br>🍿 Movie: ${answers.movie}`;
+        summaryBox.innerHTML = `✨ Day: ${answers.day}<br>🍿 Movie: ${answers.movie}<br>👕 Theme: ${answers.theme}`;
         
         document.getElementById('summary-page').classList.remove('hidden');
     }
@@ -167,6 +217,7 @@
                 Night_Out: "Yes",
                 Movie_Time: "Yes, please!",
                 Movie_Choice: answers.movie,
+                Outfit_Theme: answers.theme,
                 timestamp: new Date().toLocaleString()
             })
         });
