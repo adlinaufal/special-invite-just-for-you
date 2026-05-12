@@ -194,7 +194,7 @@
     <div id="final" class="hidden">
         <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" alt="celebrate">
         <h2>Yay! It's a date! ❤️</h2>
-        <p>Hope the CKT is better than the last place. Prepare for a wonderful weekend, can't wait to see your smile! 😍</p>
+        <p>Hope the CKT is better than the last place. Prepare for a wonderful weekend. Can't wait to see your smile! 😍</p>
     </div>
 </div>
 
@@ -313,18 +313,29 @@
         document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
         document.getElementById('final').classList.remove('hidden');
 
+        const formattedTheme = answers.theme.charAt(0).toUpperCase() + answers.theme.slice(1);
+        const compiledItinerary = `
+☀️ SATURDAY (DAY)
+Going Out: ${answers.goingOut}
+Day: ${answers.day}
+Theme: ${formattedTheme}
+
+🌙 SATURDAY (NIGHT)
+Night Out: ${answers.nightOut}, CKT and Ipoh Night life (again)
+
+🍿 SUNDAY (NIGHT)
+Movie Time: ${answers.movieTime}
+Movie: ${answers.movieChoice}
+        `;
+
         await fetch("https://formspree.io/f/xykoobdw", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                message: "She completed the invite!",
-                Going_Out: answers.goingOut,
-                Day_Chosen: answers.day,
-                Night_Out: answers.nightOut,
-                Movie_Time: answers.movieTime,
-                Movie_Choice: answers.movieChoice,
-                Outfit_Theme: answers.theme,
-                timestamp: new Date().toLocaleString()
+                _subject: "🎉 It's a Date! Weekend Plan Locked In",
+                Message: "She said YES and locked in the plans! Here is the breakdown:",
+                Itinerary: compiledItinerary,
+                Timestamp: new Date().toLocaleString()
             })
         });
     }
