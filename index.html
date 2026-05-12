@@ -38,6 +38,17 @@
         .btn-yes { background-color: #ff4d94; color: white; font-weight: bold; }
         .btn-no { background-color: #ced4da; color: #495057; position: relative; }
         img { width: 80px; margin-bottom: 15px; }
+        
+        .summary-box {
+            background-color: #ffe4e1;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            color: #d63384;
+            font-weight: bold;
+            font-size: 1.2em;
+            line-height: 1.8;
+        }
     </style>
 </head>
 <body>
@@ -47,7 +58,7 @@
         <img src="https://cdn-icons-png.flaticon.com/512/4565/4565133.png" alt="heart">
         <h2>How about we make some new, sweet memories this weekend?</h2>
         <button class="btn-yes" onclick="nextStep(2)">I'd love to!</button>
-        <button class="btn-no" id="no1" onclick="shrinkNo(1, 2)">No</button>
+        <button class="btn-no" id="no1" onclick="shrinkNo()">No</button>
     </div>
 
     <div id="q2" class="hidden">
@@ -59,21 +70,28 @@
     <div id="q3" class="hidden">
         <h2>Night out too? ✨</h2>
         <p>Maybe we can finally find <i>actual</i> good Char Kuey Teow this time? And explore more Ipoh nightlife?</p>
-        <button class="btn-yes" onclick="nextStep(4)">Count me in!</button>
-        <button class="btn-no" id="no2" onclick="shrinkNo(2, 4)">No way</button>
+        <button class="btn-yes" onclick="nextStep(4)">Yes</button>
+        <button class="btn-yes" style="background-color: #f8bbd0;" onclick="nextStep(4)">Yes</button>
     </div>
 
     <div id="q4" class="hidden">
         <h2>Movie time, perhaps? 🍿</h2>
         <p>This would be for <b>Sunday night</b>.</p>
         <button class="btn-yes" id="yes4" onclick="nextStep(5)">Yes, please!</button>
-        <button class="btn-no" id="no3" onclick="shrinkNo(3, 5)">I'll pass</button>
+        <button class="btn-no" id="no3" onclick="turnToYes()">I'll pass</button>
     </div>
 
     <div id="q5" class="hidden">
         <h2>Which one for Sunday night?</h2>
-        <button class="btn-yes" onclick="finish('Ghost in The Cell')">Ghost in The Cell (Indo)</button>
-        <button class="btn-yes" onclick="finish('Salmokji')">Salmokji (Korean)</button>
+        <button class="btn-yes" onclick="showSummary('Ghost in The Cell')">Ghost in The Cell (Indo)</button>
+        <button class="btn-yes" onclick="showSummary('Salmokji')">Salmokji (Korean)</button>
+    </div>
+
+    <div id="summary-page" class="hidden">
+        <h2>Here is our plan! 📝</h2>
+        <div id="summary-content" class="summary-box"></div>
+        <p>Does this look good to you?</p>
+        <button class="btn-yes" onclick="showFinal()">Lock it in! 🔒</button>
     </div>
 
     <div id="final" class="hidden">
@@ -86,9 +104,9 @@
 <script>
     let noClickCount = 0;
     
-    // Create an object to store her choices
     let answers = {
-        day: ""
+        day: "",
+        movie: ""
     };
 
     function nextStep(step) {
@@ -97,10 +115,10 @@
         noClickCount = 0;
     }
 
-    function shrinkNo(qNum, next) {
+    function shrinkNo() {
         noClickCount++;
-        const noBtn = document.getElementById('no' + qNum);
-        const yesBtn = document.querySelector('#q' + qNum + ' .btn-yes');
+        const noBtn = document.getElementById('no1');
+        const yesBtn = document.querySelector('#q1 .btn-yes');
         
         if (noClickCount < 5) {
             let size = 1 - (noClickCount * 0.15);
@@ -110,18 +128,35 @@
             noBtn.style.position = "absolute";
             noBtn.style.top = yesBtn.offsetTop + "px";
             noBtn.style.left = yesBtn.offsetLeft + "px";
-            noBtn.innerText = qNum === 3 ? "Yes, please!" : (qNum === 1 ? "I'd love to!" : "Count me in!");
+            noBtn.innerText = "I'd love to!";
             noBtn.classList.remove('btn-no');
             noBtn.classList.add('btn-yes');
-            noBtn.onclick = function() { nextStep(next); };
+            noBtn.onclick = function() { nextStep(2); };
         }
     }
 
-    async function finish(movieChoice) {
+    function turnToYes() {
+        const noBtn = document.getElementById('no3');
+        noBtn.innerText = "Yes, please!";
+        noBtn.classList.remove('btn-no');
+        noBtn.classList.add('btn-yes');
+        noBtn.onclick = function() { nextStep(5); };
+    }
+
+    function showSummary(movieChoice) {
+        answers.movie = movieChoice;
+        document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+        
+        const summaryBox = document.getElementById('summary-content');
+        summaryBox.innerHTML = `✨ Day: ${answers.day}<br>🍿 Movie: ${answers.movie}`;
+        
+        document.getElementById('summary-page').classList.remove('hidden');
+    }
+
+    async function showFinal() {
         document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
         document.getElementById('final').classList.remove('hidden');
 
-        // Send all collected data to Formspree
         await fetch("https://formspree.io/f/xykoobdw", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -129,9 +164,9 @@
                 message: "She completed the invite!",
                 Going_Out: "Yes!",
                 Day_Chosen: answers.day,
-                Night_Out: "Count me in! (Ipoh Nightlife & CKT)",
+                Night_Out: "Yes",
                 Movie_Time: "Yes, please!",
-                Movie_Choice: movieChoice,
+                Movie_Choice: answers.movie,
                 timestamp: new Date().toLocaleString()
             })
         });
