@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekend Plans?</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #fff5f8;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        .hidden { display: none; }
+        h2 { color: #d63384; }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .btn-yes { background-color: #ff4d94; color: white; font-weight: bold; }
+        .btn-no { background-color: #ced4da; color: #495057; position: relative; }
+        img { width: 100px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Question 1 -->
+    <div id="q1">
+        <img src="https://cdn-icons-png.flaticon.com/512/4565/4565133.png" alt="heart">
+        <h2>Do you want to go out this weekend?</h2>
+        <button class="btn-yes" onclick="nextStep(2)">Yes!</button>
+        <button class="btn-no" id="no1" onclick="shrinkNo()">No</button>
+        <p id="msg1" style="color: #ff4d94;"></p>
+    </div>
+
+    <!-- Question 2 -->
+    <div id="q2" class="hidden">
+        <h2>Saturday or Sunday?</h2>
+        <button class="btn-yes" onclick="nextStep(3)">Saturday (Best choice! ✨)</button>
+        <button class="btn-yes" style="background-color: #f8bbd0;" onclick="nextStep(3)">Sunday</button>
+    </div>
+
+    <!-- Question 3 -->
+    <div id="q3" class="hidden">
+        <h2>Night out too?</h2>
+        <p>Maybe find <i>actual</i> good Char Kuey Teow this time? And explore more Ipoh nightlife?</p>
+        <button class="btn-yes" onclick="nextStep(4)">Count me in!</button>
+        <button class="btn-no" id="no2" onclick="shrinkNo2()">No way</button>
+    </div>
+
+    <!-- Question 4 -->
+    <div id="q4" class="hidden">
+        <h2>Movie time? 🍿</h2>
+        <button class="btn-yes" onclick="nextStep(5)">Yes, please!</button>
+        <button class="btn-no" id="no3" onclick="shrinkNo3()">I'll pass</button>
+    </div>
+
+    <!-- Question 5 -->
+    <div id="q5" class="hidden">
+        <h2>Which one for Sunday?</h2>
+        <button class="btn-yes" onclick="finish()">Ghost in The Cell (Indo)</button>
+        <button class="btn-yes" onclick="finish()">Salmokji (Korean)</button>
+    </div>
+
+    <!-- Final Message -->
+    <div id="final" class="hidden">
+        <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" alt="celebrate">
+        <h2>Yay! It's a date! ❤️</h2>
+        <p>I promise the CKT will be better than the last place. Can't wait to see you!</p>
+    </div>
+</div>
+
+<script>
+    let noClickCount = 0;
+
+    function nextStep(step) {
+        document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+        document.getElementById('q' + step).classList.remove('hidden');
+        noClickCount = 0;
+    }
+
+    function shrinkNo() {
+        noClickCount++;
+        const noBtn = document.getElementById('no1');
+        const yesBtn = document.querySelector('#q1 .btn-yes');
+        
+        if (noClickCount < 5) {
+            let size = 1 - (noClickCount * 0.2);
+            noBtn.style.transform = `scale(${size})`;
+            yesBtn.style.transform = `scale(${1 + (noClickCount * 0.1)})`;
+        } else {
+            noBtn.style.position = "absolute";
+            noBtn.style.top = yesBtn.offsetTop + "px";
+            noBtn.style.left = yesBtn.offsetLeft + "px";
+            noBtn.innerText = "Yes!"; 
+            noBtn.onclick = function() { nextStep(2); };
+        }
+    }
+
+    function finish() {
+        document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+        document.getElementById('final').classList.remove('hidden');
+    }
+</script>
+</body>
+</html>
