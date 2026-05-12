@@ -81,6 +81,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 100%;
         }
         
         input[type="text"] {
@@ -89,8 +90,24 @@
             border-radius: 8px;
             border: 1px solid #ccc;
             width: 85%;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             text-align: center;
+        }
+
+        .wrong-msg {
+            color: #ff4d94;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 14px;
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
         }
     </style>
 </head>
@@ -117,8 +134,9 @@
         <p>Maybe we can finally find <i>actual</i> good Char Kuey Teow this time? And explore more Ipoh nightlife?</p>
         <div class="btn-row">
             <button class="btn-yes" onclick="answers.nightOut = 'Yes'; nextStep(4)">Yes</button>
-            <button class="btn-yes" style="background-color: #f8bbd0;" onclick="answers.nightOut = 'Yes'; nextStep(4)">Yes</button>
+            <button class="btn-no" id="night-no" onclick="triggerShake('wrong-msg')">No</button>
         </div>
+        <p id="wrong-msg" class="hidden wrong-msg">Wrong answer! Try again. 😉</p>
     </div>
 
     <div id="q4" class="hidden">
@@ -140,7 +158,7 @@
 
     <div id="q6" class="hidden">
         <h2>One last thing... the dress code! 🤎</h2>
-        <p>Can we match and wear <b>Brown</b> for the day?</p>
+        <p>Can we match and wear <b>Brown</b> for Saturday during the day?</p>
         <div class="btn-row">
             <button class="btn-yes" onclick="setTheme('Brown')">Yes, let's do it!</button>
             <button class="btn-no" onclick="nextStep(7)">No, let's wear...</button>
@@ -152,7 +170,8 @@
         <p>Pick whatever color you feel like!</p>
         <div class="color-input-area">
             <input type="text" id="color-input" placeholder="Type a color here...">
-            <button class="btn-yes" style="width: 100%;" onclick="setCustomTheme()">Set Theme</button>
+            <button class="btn-yes" style="width: 85%;" onclick="setCustomTheme()">Set Theme</button>
+            <p id="color-error" class="hidden wrong-msg">Hmm... that doesn't quite fit my wardrobe! Try another color. 😅</p>
         </div>
     </div>
 
@@ -186,6 +205,10 @@
         document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
         document.getElementById('q' + step).classList.remove('hidden');
         noClickCount = 0;
+        
+        // Hide error messages when moving pages
+        document.getElementById('wrong-msg').classList.add('hidden');
+        document.getElementById('color-error').classList.add('hidden');
     }
 
     function shrinkNo() {
@@ -211,6 +234,15 @@
         }
     }
 
+    // Reusable function to shake text
+    function triggerShake(elementId) {
+        const msg = document.getElementById(elementId);
+        msg.classList.remove('hidden');
+        msg.style.animation = 'none';
+        msg.offsetHeight; // trigger reflow
+        msg.style.animation = null; 
+    }
+
     function turnToYes() {
         const noBtn = document.getElementById('no3');
         noBtn.innerText = "Yes, please!";
@@ -227,19 +259,35 @@
         showSummary();
     }
 
+    // The new logic for subjective color choice
     function setCustomTheme() {
-        const input = document.getElementById('color-input').value;
-        if(input.trim() === "") {
-            alert("Please type a color!");
+        const inputElement = document.getElementById('color-input');
+        const errorMsg = document.getElementById('color-error');
+        const rawInput = inputElement.value.trim();
+        const normalizedInput = rawInput.toLowerCase();
+        
+        const allowedColors = ['brown', 'blue', 'cream', 'green', 'grey', 'gray'];
+
+        if (rawInput === "") {
+            errorMsg.innerText = "Please type a color!";
+            triggerShake('color-error');
             return;
         }
-        answers.theme = input;
-        showSummary();
+
+        // Check if her input contains any of the allowed colors
+        const isAllowed = allowedColors.some(color => normalizedInput.includes(color));
+
+        if (isAllowed) {
+            answers.theme = rawInput; // Keep her exact typing (e.g., "Dark Blue")
+            showSummary();
+        } else {
+            errorMsg.innerText = "Hmm... that doesn't quite fit my wardrobe! Try another color. 😅";
+            triggerShake('color-error');
+        }
     }
 
     function showSummary() {
         document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
-        
         const summaryBox = document.getElementById('summary-content');
         
         summaryBox.innerHTML = `
