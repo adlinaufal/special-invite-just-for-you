@@ -27,11 +27,10 @@
         h2 { color: #d63384; line-height: 1.4; }
         p { color: #555; line-height: 1.6; }
         
-        /* New class to make buttons sit side-by-side */
         .btn-row {
             display: flex;
             justify-content: center;
-            gap: 10px; /* Space between the buttons */
+            gap: 10px;
             margin-top: 15px;
         }
         
@@ -45,10 +44,9 @@
             transition: all 0.2s ease-in-out;
         }
         
-        /* Remove margin when buttons are inside the flex row so they align perfectly */
         .btn-row button {
             margin: 0;
-            flex: 1; /* This makes the buttons equal width if possible */
+            flex: 1;
         }
 
         .btn-yes { background-color: #ff4d94; color: white; font-weight: bold; }
@@ -61,26 +59,37 @@
             border-radius: 12px;
             margin: 20px 0;
             color: #d63384;
-            font-weight: bold;
-            font-size: 1.2em;
+            font-size: 1.1em;
             line-height: 1.8;
-            text-transform: capitalize;
+            text-align: left;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .summary-item {
+            border-bottom: 1px dashed #ffb6c1;
+            padding: 5px 0;
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
         }
 
         .color-input-area {
-            margin-top: 15px;
+            margin-top: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         
         input[type="text"] {
-            padding: 10px;
+            padding: 12px;
             font-size: 16px;
             border-radius: 8px;
             border: 1px solid #ccc;
-            width: 80%;
-            margin-bottom: 10px;
+            width: 85%;
+            margin-bottom: 15px;
             text-align: center;
         }
     </style>
@@ -91,7 +100,7 @@
     <div id="q1">
         <img src="https://cdn-icons-png.flaticon.com/512/4565/4565133.png" alt="heart">
         <h2>How about we make some new, sweet memories this weekend?</h2>
-        <button class="btn-yes" onclick="nextStep(2)">I'd love to!</button>
+        <button class="btn-yes" onclick="answers.goingOut = 'Yes'; nextStep(2)">I'd love to!</button>
         <button class="btn-no" id="no1" onclick="shrinkNo()">No</button>
     </div>
 
@@ -107,8 +116,8 @@
         <h2>Night out too? ✨</h2>
         <p>Maybe we can finally find <i>actual</i> good Char Kuey Teow this time? And explore more Ipoh nightlife?</p>
         <div class="btn-row">
-            <button class="btn-yes" onclick="nextStep(4)">Yes</button>
-            <button class="btn-yes" style="background-color: #f8bbd0;" onclick="nextStep(4)">Yes</button>
+            <button class="btn-yes" onclick="answers.nightOut = 'Yes'; nextStep(4)">Yes</button>
+            <button class="btn-yes" style="background-color: #f8bbd0;" onclick="answers.nightOut = 'Yes'; nextStep(4)">Yes</button>
         </div>
     </div>
 
@@ -116,7 +125,7 @@
         <h2>Movie time, perhaps? 🍿</h2>
         <p>This would be for <b>Sunday night</b>.</p>
         <div class="btn-row">
-            <button class="btn-yes" id="yes4" onclick="nextStep(5)">Yes, please!</button>
+            <button class="btn-yes" id="yes4" onclick="answers.movieTime = 'Yes'; nextStep(5)">Yes, please!</button>
             <button class="btn-no" id="no3" onclick="turnToYes()">I'll pass</button>
         </div>
     </div>
@@ -124,8 +133,8 @@
     <div id="q5" class="hidden">
         <h2>Which one for Sunday night?</h2>
         <div class="btn-row">
-            <button class="btn-yes" onclick="answers.movie = 'Ghost in The Cell'; nextStep(6)">Ghost in The Cell (Indo)</button>
-            <button class="btn-yes" onclick="answers.movie = 'Salmokji'; nextStep(6)">Salmokji (Korean)</button>
+            <button class="btn-yes" onclick="answers.movieChoice = 'Ghost in The Cell'; nextStep(6)">Ghost in The Cell (Indo)</button>
+            <button class="btn-yes" onclick="answers.movieChoice = 'Salmokji'; nextStep(6)">Salmokji (Korean)</button>
         </div>
     </div>
 
@@ -134,20 +143,24 @@
         <p>Can we match and wear <b>Brown</b> for the day?</p>
         <div class="btn-row">
             <button class="btn-yes" onclick="setTheme('Brown')">Yes, let's do it!</button>
-            <button class="btn-no" id="no-color-btn" onclick="showColorInput()">No, let's wear...</button>
+            <button class="btn-no" onclick="nextStep(7)">No, let's wear...</button>
         </div>
-        
-        <div id="custom-color-div" class="hidden color-input-area">
+    </div>
+
+    <div id="q7" class="hidden">
+        <h2>What color were you thinking? 🎨</h2>
+        <p>Pick whatever color you feel like!</p>
+        <div class="color-input-area">
             <input type="text" id="color-input" placeholder="Type a color here...">
-            <button class="btn-yes" style="padding: 8px 16px; font-size: 14px; margin-top: 10px;" onclick="setCustomTheme()">Set Theme</button>
+            <button class="btn-yes" style="width: 100%;" onclick="setCustomTheme()">Set Theme</button>
         </div>
     </div>
 
     <div id="summary-page" class="hidden">
         <h2>Here is our plan! 📝</h2>
         <div id="summary-content" class="summary-box"></div>
-        <p>Does this look good to you?</p>
-        <button class="btn-yes" onclick="showFinal()">Lock it in! 🔒</button>
+        <p style="margin-top: 15px; font-weight: bold;">Does this look good to you?</p>
+        <button class="btn-yes" style="width: 100%;" onclick="showFinal()">Lock it in! 🔒</button>
     </div>
 
     <div id="final" class="hidden">
@@ -161,8 +174,11 @@
     let noClickCount = 0;
     
     let answers = {
+        goingOut: "",
         day: "",
-        movie: "",
+        nightOut: "",
+        movieTime: "",
+        movieChoice: "",
         theme: ""
     };
 
@@ -188,7 +204,10 @@
             noBtn.innerText = "I'd love to!";
             noBtn.classList.remove('btn-no');
             noBtn.classList.add('btn-yes');
-            noBtn.onclick = function() { nextStep(2); };
+            noBtn.onclick = function() { 
+                answers.goingOut = "Yes";
+                nextStep(2); 
+            };
         }
     }
 
@@ -197,12 +216,10 @@
         noBtn.innerText = "Yes, please!";
         noBtn.classList.remove('btn-no');
         noBtn.classList.add('btn-yes');
-        noBtn.onclick = function() { nextStep(5); };
-    }
-
-    function showColorInput() {
-        document.getElementById('custom-color-div').classList.remove('hidden');
-        document.getElementById('no-color-btn').classList.add('hidden');
+        noBtn.onclick = function() { 
+            answers.movieTime = "Yes";
+            nextStep(5); 
+        };
     }
 
     function setTheme(color) {
@@ -224,7 +241,15 @@
         document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
         
         const summaryBox = document.getElementById('summary-content');
-        summaryBox.innerHTML = `✨ Day: ${answers.day}<br>🍿 Movie: ${answers.movie}<br>👕 Theme: ${answers.theme}`;
+        
+        summaryBox.innerHTML = `
+            <div class="summary-item"><b>Going Out:</b> ${answers.goingOut}</div>
+            <div class="summary-item"><b>Day:</b> ${answers.day}</div>
+            <div class="summary-item"><b>Night Out:</b> ${answers.nightOut}</div>
+            <div class="summary-item"><b>Movie Time:</b> ${answers.movieTime}</div>
+            <div class="summary-item"><b>Movie:</b> ${answers.movieChoice}</div>
+            <div class="summary-item"><b>Theme:</b> ${answers.theme}</div>
+        `;
         
         document.getElementById('summary-page').classList.remove('hidden');
     }
@@ -238,11 +263,11 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 message: "She completed the invite!",
-                Going_Out: "Yes!",
+                Going_Out: answers.goingOut,
                 Day_Chosen: answers.day,
-                Night_Out: "Yes",
-                Movie_Time: "Yes, please!",
-                Movie_Choice: answers.movie,
+                Night_Out: answers.nightOut,
+                Movie_Time: answers.movieTime,
+                Movie_Choice: answers.movieChoice,
                 Outfit_Theme: answers.theme,
                 timestamp: new Date().toLocaleString()
             })
