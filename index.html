@@ -26,6 +26,15 @@
         .hidden { display: none; }
         h2 { color: #d63384; line-height: 1.4; }
         p { color: #555; line-height: 1.6; }
+        
+        /* New class to make buttons sit side-by-side */
+        .btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* Space between the buttons */
+            margin-top: 15px;
+        }
+        
         button {
             padding: 12px 24px;
             margin: 10px;
@@ -35,6 +44,13 @@
             font-size: 16px;
             transition: all 0.2s ease-in-out;
         }
+        
+        /* Remove margin when buttons are inside the flex row so they align perfectly */
+        .btn-row button {
+            margin: 0;
+            flex: 1; /* This makes the buttons equal width if possible */
+        }
+
         .btn-yes { background-color: #ff4d94; color: white; font-weight: bold; }
         .btn-no { background-color: #ced4da; color: #495057; position: relative; }
         img { width: 80px; margin-bottom: 15px; }
@@ -81,39 +97,49 @@
 
     <div id="q2" class="hidden">
         <h2>Saturday or Sunday?</h2>
-        <button class="btn-yes" onclick="answers.day = 'Saturday'; nextStep(3)">Saturday (Best choice! ✨)</button>
-        <button class="btn-yes" style="background-color: #f8bbd0;" onclick="answers.day = 'Sunday'; nextStep(3)">Sunday</button>
+        <div class="btn-row">
+            <button class="btn-yes" onclick="answers.day = 'Saturday'; nextStep(3)">Saturday (Best choice! ✨)</button>
+            <button class="btn-yes" style="background-color: #f8bbd0;" onclick="answers.day = 'Sunday'; nextStep(3)">Sunday</button>
+        </div>
     </div>
 
     <div id="q3" class="hidden">
         <h2>Night out too? ✨</h2>
         <p>Maybe we can finally find <i>actual</i> good Char Kuey Teow this time? And explore more Ipoh nightlife?</p>
-        <button class="btn-yes" onclick="nextStep(4)">Yes</button>
-        <button class="btn-yes" style="background-color: #f8bbd0;" onclick="nextStep(4)">Yes</button>
+        <div class="btn-row">
+            <button class="btn-yes" onclick="nextStep(4)">Yes</button>
+            <button class="btn-yes" style="background-color: #f8bbd0;" onclick="nextStep(4)">Yes</button>
+        </div>
     </div>
 
     <div id="q4" class="hidden">
         <h2>Movie time, perhaps? 🍿</h2>
         <p>This would be for <b>Sunday night</b>.</p>
-        <button class="btn-yes" id="yes4" onclick="nextStep(5)">Yes, please!</button>
-        <button class="btn-no" id="no3" onclick="turnToYes()">I'll pass</button>
+        <div class="btn-row">
+            <button class="btn-yes" id="yes4" onclick="nextStep(5)">Yes, please!</button>
+            <button class="btn-no" id="no3" onclick="turnToYes()">I'll pass</button>
+        </div>
     </div>
 
     <div id="q5" class="hidden">
         <h2>Which one for Sunday night?</h2>
-        <button class="btn-yes" onclick="answers.movie = 'Ghost in The Cell'; nextStep(6)">Ghost in The Cell (Indo)</button>
-        <button class="btn-yes" onclick="answers.movie = 'Salmokji'; nextStep(6)">Salmokji (Korean)</button>
+        <div class="btn-row">
+            <button class="btn-yes" onclick="answers.movie = 'Ghost in The Cell'; nextStep(6)">Ghost in The Cell (Indo)</button>
+            <button class="btn-yes" onclick="answers.movie = 'Salmokji'; nextStep(6)">Salmokji (Korean)</button>
+        </div>
     </div>
 
     <div id="q6" class="hidden">
         <h2>One last thing... the dress code! 🤎</h2>
         <p>Can we match and wear <b>Brown</b> for the day?</p>
-        <button class="btn-yes" onclick="setTheme('Brown')">Yes, let's do it!</button>
-        <button class="btn-no" id="no-color-btn" onclick="showColorInput()">No, let's wear...</button>
+        <div class="btn-row">
+            <button class="btn-yes" onclick="setTheme('Brown')">Yes, let's do it!</button>
+            <button class="btn-no" id="no-color-btn" onclick="showColorInput()">No, let's wear...</button>
+        </div>
         
         <div id="custom-color-div" class="hidden color-input-area">
             <input type="text" id="color-input" placeholder="Type a color here...">
-            <button class="btn-yes" style="padding: 8px 16px; font-size: 14px;" onclick="setCustomTheme()">Set Theme</button>
+            <button class="btn-yes" style="padding: 8px 16px; font-size: 14px; margin-top: 10px;" onclick="setCustomTheme()">Set Theme</button>
         </div>
     </div>
 
@@ -176,7 +202,7 @@
 
     function showColorInput() {
         document.getElementById('custom-color-div').classList.remove('hidden');
-        document.getElementById('no-color-btn').classList.add('hidden'); // Hide the 'No' button once clicked
+        document.getElementById('no-color-btn').classList.add('hidden');
     }
 
     function setTheme(color) {
